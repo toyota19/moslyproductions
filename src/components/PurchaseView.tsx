@@ -55,9 +55,9 @@ async function prepareReceiptImage(file: File): Promise<string> {
       const img = new Image();
       img.onerror = () => reject(new Error('La imagen seleccionada no es válida.'));
       img.onload = () => {
-        // Keep original format when <= 1600px and <= 3.5MB, otherwise downscale cleanly as JPEG
-        const maxDim = 1600;
-        const needsResize = img.width > maxDim || img.height > maxDim || file.size > 3_500_000;
+        // Keep original format when <= 1400px and <= 750KB, otherwise downscale cleanly as JPEG
+        const maxDim = 1400;
+        const needsResize = img.width > maxDim || img.height > maxDim || file.size > 750_000;
         if (!needsResize) {
           resolve(dataUrl);
           return;
