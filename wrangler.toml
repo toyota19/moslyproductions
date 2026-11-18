@@ -1,7 +1,9 @@
-name = "mosly-tickets"
+name = "moslyproductions"
+main = "worker/index.ts"
 compatibility_date = "2025-05-01"
-pages_build_output_dir = "dist"
 
-# Bind your Cloudflare D1 database in the Cloudflare Pages dashboard
-# under Settings -> Bindings -> D1 database with variable name: DB
-# Optionally bind an R2 bucket with variable name: RECEIPTS_BUCKET
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = true

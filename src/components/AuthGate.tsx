@@ -39,7 +39,7 @@ export const AuthGate: React.FC<AuthGateProps> = ({ title, subtitle, onAuthentic
           ? `HTTP ${result.status} (respuesta vacía)`
           : `HTTP ${result.status}`;
         throw new Error(
-          `El backend Node.js no está activo en este dominio (${detail}). Verifica que el servidor esté ejecutando "npm start" y no solo archivos estáticos.`,
+          `Las rutas /api no están activas en este despliegue (${detail}). En Cloudflare debes publicar como Cloudflare Pages con la carpeta "functions/" en la raíz (vía Git o "wrangler pages deploy dist"), no subir solo "dist/".`,
         );
       }
 

@@ -69,6 +69,9 @@ export interface R2Bucket {
 }
 
 export interface CloudflareEnv {
+  ASSETS?: {
+    fetch(request: Request): Promise<Response>;
+  };
   DB?: D1Database;
   RECEIPTS_BUCKET?: R2Bucket;
   ADMIN_PASSWORD?: string;
