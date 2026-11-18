@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { KeyRound, Loader2 } from 'lucide-react';
-import { safeParseJson } from '../utils/api';
+import { safeReadJson } from '../utils/api';
 
 interface AuthGateProps {
   title: string;
@@ -26,24 +26,29 @@ export const AuthGate: React.FC<AuthGateProps> = ({ title, subtitle, onAuthentic
         body: JSON.stringify({ password }),
       });
 
-      const data = await safeParseJson<{
+      const result = await safeReadJson<{
         authenticated?: boolean;
         token?: string;
         error?: string;
       }>(response);
 
-      if (!data) {
+      if (!result.data) {
+        const detail = result.isHtml
+          ? `HTTP ${result.status} (respuesta HTML)`
+          : result.isEmpty
+          ? `HTTP ${result.status} (respuesta vacía)`
+          : `HTTP ${result.status}`;
         throw new Error(
-          'El servidor de acceso no respondió correctamente. Verifica que el backend esté activo.',
+          `El backend Node.js no está activo en este dominio (${detail}). Verifica que el servidor esté ejecutando "npm start" y no solo archivos estáticos.`,
         );
       }
 
-      if (!response.ok || !data.authenticated) {
-        throw new Error(data.error || 'No se pudo verificar el acceso.');
+      if (!response.ok || !result.data.authenticated) {
+        throw new Error(result.data.error || 'No se pudo verificar el acceso.');
       }
 
       setPassword('');
-      onAuthenticated(data.token || null);
+      onAuthenticated(result.data.token || null);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error de autenticación.');
     } finally {

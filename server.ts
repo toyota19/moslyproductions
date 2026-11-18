@@ -1213,6 +1213,27 @@ async function startServer(): Promise<void> {
     });
   });
 
+  // Ensure unknown /api/* routes always return JSON instead of HTML/empty fallback
+  app.all('/api/*', (_req, res) => {
+    res.status(404).json({ error: 'Endpoint de API no encontrado.' });
+  });
+
+  // Global Express error handler returning structured JSON on /api/*
+  app.use((err: Error & { status?: number; type?: string }, req: Request, res: Response, _next: NextFunction) => {
+    console.error('[SERVER_ERROR]', err.message);
+    if (req.path.startsWith('/api/')) {
+      const statusCode = err.status || (err.type === 'entity.too.large' ? 413 : 500);
+      res.status(statusCode).json({
+        error:
+          err.type === 'entity.too.large'
+            ? 'El archivo enviado supera el tamaño permitido.'
+            : 'Error interno al procesar la solicitud.',
+      });
+      return;
+    }
+    res.status(500).send('Error interno del servidor.');
+  });
+
   // Vite dev middleware vs static production serving
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
