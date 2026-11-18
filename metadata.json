@@ -1,0 +1,6 @@
+{
+  "name": "NOCTIS Club — Entradas & Control QR",
+  "description": "Plataforma de venta de entradas para discoteca con validación de comprobantes, envío automático de códigos QR vía Resend y escáner en puerta.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
