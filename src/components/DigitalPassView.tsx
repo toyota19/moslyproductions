@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, Loader2, ShieldAlert, Users } from 'lucide-react';
 import { DigitalPassData, EVENT_LOGO_URL, ZONE_PRICING } from '../types';
+import { safeParseJson } from '../utils/api';
 
 interface DigitalPassViewProps {
   token: string;
@@ -37,9 +38,9 @@ export const DigitalPassView: React.FC<DigitalPassViewProps> = ({ token, onBackT
     setErrorMsg(null);
     fetch(`/api/pass?t=${encodeURIComponent(token)}`)
       .then(async (res) => {
-        const data = (await res.json()) as DigitalPassData & { error?: string };
-        if (!res.ok) {
-          throw new Error(data.error || 'Este pase no es válido o ha expirado.');
+        const data = await safeParseJson<DigitalPassData & { error?: string }>(res);
+        if (!res.ok || !data) {
+          throw new Error(data?.error || 'Este pase no es válido o ha expirado.');
         }
         setPass(data);
       })

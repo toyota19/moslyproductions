@@ -22,6 +22,7 @@ import {
   TicketStatus,
   ZONE_PRICING,
 } from '../types';
+import { safeParseJson } from '../utils/api';
 import { AuthGate } from './AuthGate';
 
 interface AdminViewProps {
@@ -115,25 +116,26 @@ export const AdminView: React.FC<AdminViewProps> = ({
         return;
       }
 
-      const data = (await response.json()) as {
-        orders: TicketRecord[];
+      const data = await safeParseJson<{
+        orders?: TicketRecord[];
         error?: string;
-      };
-      if (!response.ok) {
-        throw new Error(data.error || 'No se pudieron cargar las solicitudes.');
+      }>(response);
+      if (!response.ok || !data) {
+        throw new Error(data?.error || 'No se pudieron cargar las solicitudes.');
       }
 
-      setOrders(data.orders);
+      const loadedOrders = data.orders ?? [];
+      setOrders(loadedOrders);
       setSelectedId((prev) => {
-        if (prev && data.orders.some((o) => o.id === prev)) return prev;
-        return data.orders[0]?.id ?? null;
+        if (prev && loadedOrders.some((o) => o.id === prev)) return prev;
+        return loadedOrders[0]?.id ?? null;
       });
     } catch (err) {
       setOrdersError(err instanceof Error ? err.message : 'Error al consultar las órdenes.');
     } finally {
       setIsLoadingOrders(false);
     }
-  }, [onLogout]);
+  }, [authToken, onLogout]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -160,9 +162,9 @@ export const AdminView: React.FC<AdminViewProps> = ({
         return;
       }
 
-      const data = (await response.json()) as { order?: TicketRecord; error?: string };
-      if (!response.ok || !data.order) {
-        throw new Error(data.error || 'No se pudo aprobar la solicitud.');
+      const data = await safeParseJson<{ order?: TicketRecord; error?: string }>(response);
+      if (!response.ok || !data?.order) {
+        throw new Error(data?.error || 'No se pudo aprobar la solicitud.');
       }
 
       const updated = data.order;
@@ -207,9 +209,9 @@ export const AdminView: React.FC<AdminViewProps> = ({
         return;
       }
 
-      const data = (await response.json()) as { order?: TicketRecord; error?: string };
-      if (!response.ok || !data.order) {
-        throw new Error(data.error || 'No se pudo rechazar la solicitud.');
+      const data = await safeParseJson<{ order?: TicketRecord; error?: string }>(response);
+      if (!response.ok || !data?.order) {
+        throw new Error(data?.error || 'No se pudo rechazar la solicitud.');
       }
 
       const updated = data.order;

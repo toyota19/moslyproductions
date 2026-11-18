@@ -45,7 +45,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 2: Public customer links vs private staff links */}
         {isStaffRoute ? (
-          <nav aria-label="Navegación interna" className="flex items-center gap-5 sm:gap-7 overflow-x-auto">
+          <nav
+            aria-label="Navegación interna"
+            className="flex items-center gap-5 sm:gap-7 overflow-x-auto overflow-y-hidden md:overflow-visible"
+          >
             <button
               type="button"
               onClick={() => onNavigate('admin')}
@@ -56,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Panel Admin
               {activeView === 'admin' && (
-                <span aria-hidden="true" className="absolute inset-x-0 -bottom-[1px] h-[2px] bg-amber-500" />
+                <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[2px] bg-amber-500" />
               )}
             </button>
             <button
@@ -69,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Escáner Puerta
               {activeView === 'scanner' && (
-                <span aria-hidden="true" className="absolute inset-x-0 -bottom-[1px] h-[2px] bg-amber-500" />
+                <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[2px] bg-amber-500" />
               )}
             </button>
             <button
@@ -81,7 +84,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
         ) : (
-          <nav aria-label="Navegación principal" className="flex items-center gap-5 sm:gap-7 overflow-x-auto">
+          <nav
+            aria-label="Navegación principal"
+            className="flex items-center gap-5 sm:gap-7 overflow-x-auto overflow-y-hidden md:overflow-visible"
+          >
             <button
               type="button"
               onClick={() => onScrollToSection('zonas')}

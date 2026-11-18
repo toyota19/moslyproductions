@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { KeyRound, Loader2 } from 'lucide-react';
+import { safeParseJson } from '../utils/api';
 
 interface AuthGateProps {
   title: string;
@@ -25,11 +26,18 @@ export const AuthGate: React.FC<AuthGateProps> = ({ title, subtitle, onAuthentic
         body: JSON.stringify({ password }),
       });
 
-      const data = (await response.json()) as {
+      const data = await safeParseJson<{
         authenticated?: boolean;
         token?: string;
         error?: string;
-      };
+      }>(response);
+
+      if (!data) {
+        throw new Error(
+          'El servidor de acceso no respondió correctamente. Verifica que el backend esté activo.',
+        );
+      }
+
       if (!response.ok || !data.authenticated) {
         throw new Error(data.error || 'No se pudo verificar el acceso.');
       }

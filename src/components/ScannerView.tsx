@@ -21,6 +21,7 @@ import {
   ScannerValidationResponse,
   ZONE_PRICING,
 } from '../types';
+import { safeParseJson } from '../utils/api';
 import { AuthGate } from './AuthGate';
 
 interface ScannerViewProps {
@@ -143,8 +144,10 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
         return;
       }
       if (response.ok) {
-        const data = (await response.json()) as ScannerRecentResponse;
-        setRecentData(data);
+        const data = await safeParseJson<ScannerRecentResponse>(response);
+        if (data) {
+          setRecentData(data);
+        }
       }
     } catch {
       // Ignore silent refresh failures
@@ -183,7 +186,10 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           return;
         }
 
-        const payload = (await response.json()) as ScannerValidationResponse;
+        const payload = await safeParseJson<ScannerValidationResponse>(response);
+        if (!payload) {
+          throw new Error('Empty response');
+        }
         setLastResult(payload);
         playFeedbackFeedback(payload.valid ? 'success' : 'error', soundEnabled);
         fetchRecent();

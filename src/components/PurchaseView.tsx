@@ -22,6 +22,7 @@ import {
   TicketZone,
   ZONE_PRICING,
 } from '../types';
+import { safeParseJson } from '../utils/api';
 
 const HERO_IMAGE = '/src/assets/images/hero_club_atmosphere_1794972877352.jpg';
 const ZONE_IMAGES: Record<TicketZone, string> = {
@@ -199,9 +200,11 @@ export const PurchaseView: React.FC<PurchaseViewProps> = ({
         }),
       });
 
-      const payload = (await response.json()) as OrderCreateResponse & { error?: string };
-      if (!response.ok) {
-        throw new Error(payload.error || 'No se pudo completar tu solicitud. Intenta nuevamente.');
+      const payload = await safeParseJson<OrderCreateResponse & { error?: string }>(response);
+      if (!response.ok || !payload) {
+        throw new Error(
+          payload?.error || 'No se pudo completar tu solicitud. Intenta nuevamente.',
+        );
       }
 
       setConfirmedOrder(payload);

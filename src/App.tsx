@@ -10,6 +10,7 @@ import { ActiveView, Navbar } from './components/Navbar';
 import { PurchaseView } from './components/PurchaseView';
 import { ScannerView } from './components/ScannerView';
 import { TicketZone } from './types';
+import { safeParseJson } from './utils/api';
 
 const SESSION_STORAGE_KEY = 'mosly_session_token';
 
@@ -66,8 +67,8 @@ export default function App() {
         headers: activeToken ? { Authorization: `Bearer ${activeToken}` } : undefined,
       });
       if (response.ok) {
-        const data = (await response.json()) as { authenticated?: boolean };
-        const valid = Boolean(data.authenticated);
+        const data = await safeParseJson<{ authenticated?: boolean }>(response);
+        const valid = Boolean(data?.authenticated);
         setIsAuthenticated(valid);
         if (!valid) {
           setAuthToken(null);
