@@ -19,11 +19,16 @@ export const onRequestPost: PagesFunction<CloudflareEnv> = async ({ request, env
   const adminPassword = getAdminPassword(env);
   const qrSecret = getQrSecretKey(env);
   if (!adminPassword || !qrSecret) {
-    console.error('[AUTH] Missing ADMIN_PASSWORD or QR_SECRET_KEY in Cloudflare environment.');
+    const missing = [
+      !adminPassword ? 'ADMIN_PASSWORD' : null,
+      !qrSecret ? 'QR_SECRET_KEY' : null,
+    ]
+      .filter(Boolean)
+      .join(' y ');
+    console.error(`[AUTH] Missing runtime secret(s): ${missing}`);
     return jsonResponse(
       {
-        error:
-          'Falta configurar ADMIN_PASSWORD y QR_SECRET_KEY en las variables secretas de Cloudflare Pages.',
+        error: `Falta configurar ${missing} en Variables y secretos de tiempo de ejecución del Worker (sección Vinculaciones, no en Compilaciones).`,
       },
       503,
     );
